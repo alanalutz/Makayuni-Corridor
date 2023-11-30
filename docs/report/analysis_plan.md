@@ -61,12 +61,7 @@ Include citations to important software projects, plugins or packages and their 
 
 ### Data and variables
 
-Describe the **data sources** and **variables** to be used.
-Data sources may include plans for observing and recording **primary data** or descriptions of **secondary data**.
-For secondary data sources with numerous variables, the analysis plan authors may focus on documenting only the variables intended for use in the study.
-
-Primary data sources for the study are to include ... .
-Secondary data sources for the study are to include ... .
+Secondary data sources for the study are to include land cover, buffer region, merged buildings, initial clip, major roads, secondary roads, bomas, bounding box, and adjusted study site.
 
 Each of the next subsections describes one data source.
 
@@ -75,15 +70,13 @@ Each of the next subsections describes one data source.
 **Standard Metadata**
 
 - `Abstract`: A raster of classified landcover for the entire country of Tanzania.
+- `Label`: landcover.tif
 - `Spatial Coverage`: Tanzania
 - `Spatial Resolution`: 4.78m
 - `Spatial Reference System`: EPSG 3857
 - `Temporal Coverage`: 2023
-- `Temporal Resolution`: N/A
 - `Lineage`: (Song et al 2023)[https://doi.org/10.1016/j.jag.2022.103152]
 - `Distribution`: Shared by original authors
-- `Constraints`: Unknown
-- `Data Quality`: No planned quality assessment
 - `Bands`: 1
   - `Label`: Landcover
   - `Definition`: Classified landcover type using satellite imagery
@@ -102,83 +95,52 @@ Each of the next subsections describes one data source.
 
 #### Buffer Region
 
-
-
-#### Secondary data source1 name
-
-**Standard Metadata**
-
 - `Abstract`: Buffer region used to avoid edge effects
-- `Spatial Coverage`: Specify the geographic extent of your study. This may be a place name and link to a feature in a gazetteer like GeoNames or OpenStreetMap, or a well known text (WKT) representation of a bounding box.
-- `Spatial Resolution`: Specify the spatial resolution as a scale factor, description of the level of detail of each unit of observation (including administrative level of administrative areas), and/or or distance of a raster GRID size
-- `Spatial Reference System`: Specify the geographic or projected coordinate system for the study
-- `Temporal Coverage`: Specify the temporal extent of your study---i.e. the range of time represented by the data observations.
-- `Temporal Resolution`: Specify the temporal resolution of your study---i.e. the duration of time for which each observation represents or the revisit period for repeated observations
-- `Lineage`: Describe and/or cite data sources and/or methodological steps used to create this data source
-- `Distribution`: Describe how the data is distributed, including any persistent identifier (e.g. DOI) or URL for data access
-- `Constraints`: Legal constraints for *access* or *use* to protect *privacy* or *intellectual property rights*
-- `Data Quality`: State result of quality assessment or state "Quality unknown"
-- `Variables`: For each variable, enter the following information. If you have two or more variables per data source, you may want to present this information in table form (shown below)
-  - `Label`: variable name as used in the data or code
-  - `Alias`: intuitive natural language name
-  - `Definition`: Short description or definition of the variable. Include measurement units in description.
-  - `Type`: data type, e.g. character string, integer, real
-  - `Accuracy`: e.g. uncertainty of measurements
-  - `Domain`: Range (Maximum and Minimum) of numerical data, or codes or categories of nominal data, or reference to a standard codebook
-  - `Missing Data Value(s)`: Values used to represent missing data and frequency of missing data observations
-  - `Missing Data Frequency`: Frequency of missing data observations
+- `Label`: buffer_region.shp
+- `Spatial Coverage`: 833295.2141958434367552,9585634.2357019279152155 : 860913.8547548535279930,9617039.8727052193135023
+- `Spatial Reference System`: EPSG 32736
+- `Distribution`: Shared by original authors
 
-| Label | Alias | Definition | Type | Accuracy | Domain | Missing Data Value(s) | Missing Data Frequency |
-| :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
-| variable1 | ... | ... | ... | ... | ... | ... | ... |
-| variable2 | ... | ... | ... | ... | ... | ... | ... |
+#### Merged Buildings
 
-### Prior observations  
+- `Abstract`: Microsoft and OSM buildings combined
+- `Label`: merged_buildings.shp
+- `Spatial Coverage`: 4007553.8440031828358769,-414102.9735587749746628 : 4033053.2097658971324563,-387288.0955167215433903
+- `Spatial Reference System`: EPSG 3857
+- `Distribution`: Shared by original authors
 
-Prior experience with the study area, prior data collection, or prior observation of the data can compromise the validity of a study, e.g. through p-hacking.
-Therefore, disclose any prior experience or observations at the time of study pre-registration here, with example text below:
+#### Initial Clip
 
-At the time of this study pre-registration, the authors had _____ prior knowledge of the geography of the study region with regards to the ____ phenomena to be studied.
-This study is related to ____ prior studies by the authors
+- `Abstract`: Shapefile used to initially clip landcover map, larger than study area and bounding box
+- `Label`: initial clip.shp
+- `Spatial Coverage`: 830767.7591739012859762,9581072.9865449033677578 : 862007.9419027733383700,9619914.2523989714682102
+- `Spatial Reference System`: EPSG 32736
+- `Distribution`: Shared by original authors
 
-For each primary data source, declare the extent to which authors had already engaged with the data:
+### Prior observations
 
-- [ ] no data collection has started
-- [ ] pilot test data has been collected
-- [ ] data collection is in progress and data has not been observed
-- [ ] data collection is in progress and __% of data has been observed
-- [ ] data collection is complete and data has been observed. Explain how authors have already manipulated / explored the data.
+At the time of this study pre-registration, the authors had no prior knowledge of the geography of the study region with regards to the phenomena to be studied.
+This study is related to not prior studies by the authors
 
-For each secondary source, declare the extent to which authors had already engaged with the data:
-
-- [ ] data is not available yet
-- [ ] data is available, but only metadata has been observed
-- [ ] metadata and descriptive statistics have been observed
-- [ ] metadata and a pilot test subset or sample of the full dataset have been observed
-- [ ] the full dataset has been observed. Explain how authors have already manipulated / explored the data.
-
-If pilot test data has been collected or acquired, describe how the researchers observed and analyzed the pilot test, and the extent to which the pilot test influenced the research design.
+For each data source, the authors have observed the layers and their metadata in QGIS.
 
 ### Bias and threats to validity
 
-Given the research design and primary data to be collected and/or secondary data to be used, discuss common threats to validity and the approach to mitigating those threats, with an emphasis on geographic threats to validity.
+There are several possible geographic threats to validity in a wildlife corridor analysis.
+The primary threat is boundary distortion, also known as edge effects.
+This issue may be addressed by using a buffer region around the study area, and assigning this buffer a high cost.
+This method will prevent unrealistic low-cost pathways from forming around the edge of the study area.
 
-These include:
-  - uneven primary data collection due to geographic inaccessibility or other constraints
-  - multiple hypothesis testing
-  - edge or boundary effects
-  - the modifiable areal unit problem
-  - nonstationarity
-  - spatial dependence or autocorrelation
-  - temporal dependence or autocorrelation
-  - spatial scale dependency
-  - spatial anisotropies
-  - confusion of spatial and a-spatial causation
-  - ecological fallacy
-  - uncertainty e.g. from spatial disaggregation, anonymization, differential privacy
+A second threat is space-time interactions.
+Wildlife movement patterns and landscape characteristics can change over time, especially over the course of a year, due to seasonal variations.
+Corridor analyses that do not take into account temporal considerations may not accurately capture these dynamics.
+This threat to validity will be difficult to address without additional temporal data that accounts for changing movement behaviors or landscape characteristics.
 
 ### Data transformations
 
+- Reproject all layers to a common CRS (EPSG 32736)
+- Rasterize all shapefiles
+- Clip all layers to 
 Describe all data transformations planned to prepare data sources for analysis.
 This section should explain with the fullest detail possible how to transform data from the **raw** state at the time of acquisition or observation, to the pre-processed **derived** state ready for the main analysis.
 Including steps to check and mitigate sources of **bias** and **threats to validity**.
