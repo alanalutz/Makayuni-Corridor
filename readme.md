@@ -1,51 +1,37 @@
-If you use this template for research, please [cite it](template_reference.bib):
+This template is modified from:
 > Kedron, P., & Holler, J. (2023). Template for Reproducible and Replicable Research in Human-Environment and Geographical Sciences. https://doi.org/10.17605/OSF.IO/W29MQ
 
-# Title of Study
+# Makuyuni Wildlife Corridor: Analysis of the Effects of Socioecological Interactions and Changing Land Use on Movement Patterns of Large Mammal Species
 
 ## Contributors
 
-- First Name Last Name\*, email address, @githubname, ORCID link, affiliated institution(s)
-- First Name Last Name, email address, @githubname, ORCID link, affiliated institution(s)
+- Emmanuel H. Lyimo\*, lyimo.emanuel@gmail.com, @githubname, ORCID: 0000-0002-5750-8636, College of African Wildlife Management, Mweka. P.O Box 3031, Moshi, Tanzania
+- Gabriel M. Mayengo, mayengogabriel@gmail.com, College of African Wildlife Management, Mweka. P.O Box 3031, Moshi, Tanzania
+- David J. Castico, 
 
-\* Corresponding author and creator
+\* Emmanuel H. Lyimo
 
 ## Abstract
 
-Write a brief abstract about your research project.
-If the project is a reproduction or replication study, include the full citation with a statement
-This study is a *reproduction/replication* of:
-
-> citation to prior study
-
-A graphical abstract of the study could also be included as an image here.
+This study is a reproduction of unpublished research by Emmanual H Lyimo et al (2023), titled: Makuyuni Wildlife Corridor: Analysis of the Effects of Socioecological Interactions and Changing Land Use on Movement Patterns of Large Mammal Species.
+The original study evaluated the connectivity of Makuyuni Wildlife Corridor, a stretch of unprotected land between Tarangire National Park and Essmingor National Forest Reserve in Tanzania.
+We reproduce the first part of the study, a multifactor analysis model that approximates cost of movement through the corridor based on least cost pathway analysis.
+The study was originally conducted using the QGIS Model Builder, and we reproduce the workflow in R.
+The goal of the study is to reproduce the authors' map displaying the minimum cost of movement through each point in the study area, compare the reproduced map to the original map, and evaluate why the reproduction may differ from the original.
 
 ## Study Metadata
 
-- `Key words`: Comma-separated list of keywords (tags) for searchability. Geographers often use one or two keywords each for: theory, geographic context, and methods.
-- `Subject`: select from the [BePress Taxonomy](http://digitalcommons.bepress.com/cgi/viewcontent.cgi?article=1008&context=reference)
-- `Date created`: date when project was started
-- `Date modified`: date of most recent revision
-- `Spatial Coverage`: Specify the geographic extent of your study. This may be a place name and link to a feature in a gazetteer like GeoNames or OpenStreetMap, or a well known text (WKT) representation of a bounding box.
-- `Spatial Resolution`: Specify the spatial resolution as a scale factor, description of the level of detail of each unit of observation (including administrative level of administrative areas), and/or or distance of a raster GRID size
-- `Spatial Reference System`: Specify the geographic or projected coordinate system for the study
-- `Temporal Coverage`: Specify the temporal extent of your study---i.e. the range of time represented by the data observations.
-- `Temporal Resolution`: Specify the temporal resolution of your study---i.e. the duration of time for which each observation represents or the revisit period for repeated observations
+- `Key words`: multifactor analysis, least cost pathway, wildlife corridor, movement cost, Makayuni, Tarangire, Essmingor, Tanzania
+- `Subject`: Social and Behavioral Sciences: Geography: Nature and Society Relations
+- `Date created`: 11-30-2023
+- `Date modified`: 11-30-2023
+- `Spatial Coverage`: Makayuni Wildlife Corridor, Tanzania
+- `Spatial Resolution`: 10m
+- `Spatial Reference System`: EPSG 32736
+- `Temporal Coverage`: 2023
+- `Temporal Resolution`: N/A
 - `Funding Name`: name of funding for the project
 - `Funding Title`: title of project grant
-- `Award info URI`: web address for award information
-- `Award number`: award number
-
-## Related to
-
-- `OSF Project`:
-- `Pre-analysis Registration`:
-- `Post-analysis Report Registration`:
-- `Preprint`:
-- `Conference Presentation`:
-- `Publication`:
-- `Prior Study`:
-- `...`:
 
 ## Metadata for access
 
