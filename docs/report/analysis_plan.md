@@ -1,60 +1,60 @@
-# Title of Study
+# Makuyuni Wildlife Corridor: Analysis of the Effects of Socioecological Interactions and Changing Land Use on Movement Patterns of Large Mammal Species
 
-### Authors
+## Authors
 
-- First Name Last Name\*, email address, @githubname, ORCID link, affiliated institution(s)
-- First Name Last Name, email address, @githubname, ORCID link, affiliated institution(s)
+- Emmanuel H. Lyimo\*, lyimo.emanuel@gmail.com, @githubname, ORCID: 0000-0002-5750-8636, College of African Wildlife Management, Mweka. P.O Box 3031, Moshi, Tanzania
+- Gabriel M. Mayengo, mayengogabriel@gmail.com, College of African Wildlife Management, Mweka. P.O Box 3031, Moshi, Tanzania
+- David J. Castico, 
 
 \* Corresponding author and creator
 
-### Abstract
+## Abstract
 
-Write a brief abstract about your research project.
+This study is a reproduction of unpublished research by Emmanual H Lyimo et al (2023), titled: Makuyuni Wildlife Corridor: Analysis of the Effects of Socioecological Interactions and Changing Land Use on Movement Patterns of Large Mammal Species.
+The original study evaluated the connectivity of Makuyuni Wildlife Corridor, a stretch of unprotected land between Tarangire National Park and Essmingor National Forest Reserve in Tanzania.
+We reproduce the first part of the study, a multifactor analysis model that approximates cost of movement through the corridor based on least cost pathway analysis.
+The study was originally conducted using the QGIS Model Builder, and we reproduce the workflow in R.
+The goal of the study is to reproduce the authors' map displaying the minimum cost of movement through each point in the study area, compare the reproduced map to the original map, and evaluate why the reproduction may differ from the original.
 
-If the project is a reproduction or replication study, include a declaration of the study type with a full reference to the original study.
-For example:
+## Study Metadata
 
-This study is a *replication* of:
-
-> citation to prior study
-
-A graphical abstract of the study could also be included as an image here.
-
-### Study metadata
-
-- `Key words`: Comma-separated list of keywords (tags) for searchability. Geographers often use one or two keywords each for: theory, geographic context, and methods.
-- `Subject`: select from the [BePress Taxonomy](http://digitalcommons.bepress.com/cgi/viewcontent.cgi?article=1008&context=reference)
-- `Date created`: date when project was started
-- `Date modified`: date of most recent revision
-- `Spatial Coverage`: Specify the geographic extent of your study. This may be a place name and link to a feature in a gazetteer like GeoNames or OpenStreetMap, or a well known text (WKT) representation of a bounding box.
-- `Spatial Resolution`: Specify the spatial resolution as a scale factor, description of the level of detail of each unit of observation (including administrative level of administrative areas), and/or or distance of a raster GRID size
-- `Spatial Reference System`: Specify the geographic or projected coordinate system for the study, e.g. EPSG:4326
-- `Temporal Coverage`: Specify the temporal extent of your study---i.e. the range of time represented by the data observations.
-- `Temporal Resolution`: Specify the temporal resolution of your study---i.e. the duration of time for which each observation represents or the revisit period for repeated observations
+- `Key words`: multifactor analysis, least cost pathway, wildlife corridor, movement cost, Makayuni, Tarangire, Essmingor, Tanzania
+- `Subject`: Social and Behavioral Sciences: Geography: Nature and Society Relations
+- `Date created`: 11-30-2023
+- `Date modified`: 11-30-2023
+- `Spatial Coverage`: Makayuni Wildlife Corridor, Tanzania
+- `Spatial Resolution`: 10m
+- `Spatial Reference System`: EPSG 32736
+- `Temporal Coverage`: 2023
+- `Temporal Resolution`: N/A
 - `Funding Name`: name of funding for the project
 - `Funding Title`: title of project grant
-- `Award info URI`: web address for award information
-- `Award number`: award number
 
 #### Original study spatio-temporal metadata
 
-- `Spatial Coverage`: extent of original study
-- `Spatial Resolution`: resolution of original study
-- `Spatial Reference System`: spatial reference system of original study
-- `Temporal Coverage`: temporal extent of original study
-- `Temporal Resolution`: temporal resolution of original study
+Because this is a reproduction study, the original study spatio-temporal metadata is identical to the study metadata.
 
 ## Study design
 
-Describe how the study relates to prior literature, e.g. is it a **original study**, **meta-analysis study**, **reproduction study**, **reanalysis study**, or **replication study**?
-
-Also describe the original study archetype, e.g. is it **observational**, **experimental**, **quasi-experimental**, or **exploratory**?
-
-Enumerate specific **hypotheses** to be tested or **research questions** to be investigated here, and specify the type of method, statistical test or model to be used on the hypothesis or question.
+This study is a reproduction of an original observational study that created a cost surface of wildlife movement in Makayuni Wildlife Corridor.
+We aim to reproduce the original study's Figure 5, a map of the cost surface, in the R computational environment rather than the QGIS Model Builder environment used by the original authors.
+The null hypothesis is that there are no differences between the reproduced cost surface map and the original cost surface map.
+The alternative hypothesis is that there are differences between the reproduced cost surface map and the original cost surface map.
+We will test this hypothesis by visually comparing the two maps after standardizing to the same color range.
 
 ## Materials and procedure
 
+We are using the original study data, metadata, workflow, and QGIS Model shared by the original authors.
+We will reproduce the author's original methodology as closely as possible using an R script, using the same data.
+
 ### Computational environment
+
+R
+RStudio
+groundhog
+raster
+stars
+sf
 
 Define the hardware, operating system, and software requirements for the research.
 Include citations to important software projects, plugins or packages and their versions.
@@ -70,49 +70,45 @@ Secondary data sources for the study are to include ... .
 
 Each of the next subsections describes one data source.
 
-#### Primary data source1 name
+#### Land Cover
 
 **Standard Metadata**
 
-- `Abstract`: Brief description of the data source
-- `Spatial Coverage`: Specify the geographic extent of your study. This may be a place name and link to a feature in a gazetteer like GeoNames or OpenStreetMap, or a well known text (WKT) representation of a bounding box.
-- `Spatial Resolution`: Specify the spatial resolution as a scale factor, description of the level of detail of each unit of observation (including administrative level of administrative areas), and/or or distance of a raster GRID size
-- `Spatial Reference System`: Specify the geographic or projected coordinate system for the study
-- `Temporal Coverage`: Specify the temporal extent of your study---i.e. the range of time represented by the data observations.
-- `Temporal Resolution`: Specify the temporal resolution of your study---i.e. the duration of time for which each observation represents or the revisit period for repeated observations
-- `Lineage`: Describe and/or cite data sources and/or methodological steps planned to create this data source.
-  - sampling scheme, including spatial sampling
-  - target sample size and method for determining sample size
-  - stopping criteria for data collection and sampling (e.g. sample size, time elapsed)
-  - de-identification / anonymization
-  - experimental manipulation
-- `Distribution`: Describe who will make the data available and how?
-- `Constraints`: Legal constraints for *access* or *use* to protect *privacy* or *intellectual property rights*
-- `Data Quality`: State any planned quality assessment
-- `Variables`: For each variable, enter the following information. If you have two or more variables per data source, you may want to present this information in table form (shown below)
-  - `Label`: variable name as used in the data or code
-  - `Alias`: intuitive natural language name
-  - `Definition`: Short description or definition of the variable. Include measurement units in description.
-  - `Type`: data type, e.g. character string, integer, real
+- `Abstract`: A raster of classified landcover for the entire country of Tanzania.
+- `Spatial Coverage`: Tanzania
+- `Spatial Resolution`: 4.78m
+- `Spatial Reference System`: EPSG 3857
+- `Temporal Coverage`: 2023
+- `Temporal Resolution`: N/A
+- `Lineage`: (Song et al 2023)[https://doi.org/10.1016/j.jag.2022.103152]
+- `Distribution`: Shared by original authors
+- `Constraints`: Unknown
+- `Data Quality`: No planned quality assessment
+- `Bands`: 1
+  - `Label`: Landcover
+  - `Definition`: Classified landcover type using satellite imagery
+  - `Type`: integer
   - `Accuracy`: e.g. uncertainty of measurements
-  - `Domain`: Expected range of Maximum and Minimum of numerical data, or codes or categories of nominal data, or reference to a standard codebook
-  - `Missing Data Value(s)`: Values used to represent missing data and frequency of missing data observations
-  - `Missing Data Frequency`: Frequency of missing data observations: not yet known for data to be collected
+  - `Domain`: 0-8
+  - `Values`:
+      - 1 (orange): cropland
+      - 2 (dark green): forest/dense tree
+      - 3 (light green): grassland
+      - 4 (green): shrubland
+      - 5 (blue): water
+      - 6 (gray): built-up
+      - 7 (yellow): bareland
+      - 8 (teal): wetlands
 
-| Label | Alias | Definition | Type | Accuracy | Domain | Missing Data Value(s) | Missing Data Frequency |
-| :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
-| variable1 | ... | ... | ... | ... | ... | ... | ... |
-| variable2 | ... | ... | ... | ... | ... | ... | ... |
+#### Buffer Region
 
-#### Primary data source2 name
 
-... same form as above...
 
 #### Secondary data source1 name
 
 **Standard Metadata**
 
-- `Abstract`: Brief description of the data source
+- `Abstract`: Buffer region used to avoid edge effects
 - `Spatial Coverage`: Specify the geographic extent of your study. This may be a place name and link to a feature in a gazetteer like GeoNames or OpenStreetMap, or a well known text (WKT) representation of a bounding box.
 - `Spatial Resolution`: Specify the spatial resolution as a scale factor, description of the level of detail of each unit of observation (including administrative level of administrative areas), and/or or distance of a raster GRID size
 - `Spatial Reference System`: Specify the geographic or projected coordinate system for the study
@@ -136,10 +132,6 @@ Each of the next subsections describes one data source.
 | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
 | variable1 | ... | ... | ... | ... | ... | ... | ... |
 | variable2 | ... | ... | ... | ... | ... | ... | ... |
-
-#### Secondary data source2 name
-
-... same form as above...
 
 ### Prior observations  
 
