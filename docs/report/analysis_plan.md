@@ -2,9 +2,25 @@
 
 ## Authors
 
-- Emmanuel H. Lyimo\*, lyimo.emanuel@gmail.com, @githubname, ORCID: 0000-0002-5750-8636, College of African Wildlife Management, Mweka. P.O Box 3031, Moshi, Tanzania
-- Gabriel M. Mayengo, mayengogabriel@gmail.com, College of African Wildlife Management, Mweka. P.O Box 3031, Moshi, Tanzania
-- David J. Castico, 
+- Emmanuel H. Lyimo<sup>1</sup>\*, email address, [ORCID link](https://orcid.org/0000-0002-5750-8636)
+- Gabriel M. Mayengo<sup>1</sup>, mayengogabriel@gmail.com
+- David J. Castico<sup>2</sup>, davidcastico@gmail.com
+- Damian Nguma<sup>3</sup>, damiannguma@gmail.com
+- Kwaslema M. Hariohay<sup>1</sup>, kwaslema2000@gmail.com
+- Alex W. Kisingo<sup>1</sup>, alexkisingo@gmail.com
+- Justin Lucas<sup>4</sup>
+- Niwaeli Kimambo<sup>4</sup>
+- Joseph Holler<sup>4</sup>
+- Alana Lutz<sup>4</sup>
+- Andy Atallah<sup>4</sup>
+
+<sup>1</sup> College of African Wildlife Management, Mweka. P.O Box 3031, Moshi, Tanzania 
+
+<sup>2</sup>Tanzania People and Wildlife, P.O Box 11306, Arusha, Tanzania
+
+<sup>3</sup> Tanzania Wildlife Research Institute, P.O Box 661, Arusha, Tanzania
+
+<sup>4</sup> Middlebury College, Middlebury, Vermont 05753, USA
 
 \* Corresponding author and creator
 
@@ -27,8 +43,6 @@ The goal of the study is to reproduce the authors' map displaying the minimum co
 - `Spatial Reference System`: EPSG 32736
 - `Temporal Coverage`: 2023
 - `Temporal Resolution`: N/A
-- `Funding Name`: name of funding for the project
-- `Funding Title`: title of project grant
 
 #### Original study spatio-temporal metadata
 
@@ -49,25 +63,26 @@ We will reproduce the author's original methodology as closely as possible using
 
 ### Computational environment
 
-R
-RStudio
-groundhog
-raster
-stars
-sf
+Hardware: Lenovo ThinkStation
+OS: Windows 11 Pro
 
-Define the hardware, operating system, and software requirements for the research.
-Include citations to important software projects, plugins or packages and their versions.
+R Version 2023.06.2+561 (2023.06.2+561)
+
+R Packages:
+- groundhog
+- raster
+- stars
+- sf
+
+include citations and versions of these packages
 
 ### Data and variables
 
-Secondary data sources for the study are to include land cover, buffer region, merged buildings, initial clip, major roads, secondary roads, bomas, bounding box, and adjusted study site.
+Secondary data sources for the study are to include land cover, buffer region, merged buildings, initial clip, adjusted study site, bouding box, secondary roads, bomas, and major roads.
 
 Each of the next subsections describes one data source.
 
 #### Land Cover
-
-**Standard Metadata**
 
 - `Abstract`: A raster of classified landcover for the entire country of Tanzania.
 - `Label`: landcover.tif
@@ -99,7 +114,10 @@ Each of the next subsections describes one data source.
 - `Label`: buffer_region.shp
 - `Spatial Coverage`: 833295.2141958434367552,9585634.2357019279152155 : 860913.8547548535279930,9617039.8727052193135023
 - `Spatial Reference System`: EPSG 32736
+- `Lineage`: Sourced from the shared data from the original authors, presumed to be namely Justin Lucas. 
 - `Distribution`: Shared by original authors
+- `Constraints`: Unknown
+- `Data Quality`: No planned quality assessment.
 
 #### Merged Buildings
 
@@ -107,7 +125,10 @@ Each of the next subsections describes one data source.
 - `Label`: merged_buildings.shp
 - `Spatial Coverage`: 4007553.8440031828358769,-414102.9735587749746628 : 4033053.2097658971324563,-387288.0955167215433903
 - `Spatial Reference System`: EPSG 3857
+- `Lineage`: Sourced from the shared data from the original authors, presumed to be namely Justin Lucas. 
 - `Distribution`: Shared by original authors
+- `Constraints`: Unknown
+- `Data Quality`: No planned quality assessment.
 
 #### Initial Clip
 
@@ -115,7 +136,88 @@ Each of the next subsections describes one data source.
 - `Label`: initial clip.shp
 - `Spatial Coverage`: 830767.7591739012859762,9581072.9865449033677578 : 862007.9419027733383700,9619914.2523989714682102
 - `Spatial Reference System`: EPSG 32736
+- `Lineage`: Sourced from the shared data from the original authors, presumed to be namely Justin Lucas. 
 - `Distribution`: Shared by original authors
+- `Constraints`: Unknown
+- `Data Quality`: No planned quality assessment.
+
+#### Adjusted Study Site
+
+- `Abstract`: This is a shapefile for the study site (i.e. the Makuyuni Wildlife Corridor)
+- `Label`: adjusted_studysite.shp
+- `Spatial Coverage`: The data source pertains to Makuyuni Wildlife Corridor.
+- `Spatial Resolution`: Unknown
+- `Spatial Extent`: 833295.2141958434367552,9588552.1709635984152555 : 858831.0715981726534665,9615078.0293724834918976
+- `Spatial Reference System`: EPSG:32736 - WGS 84 / UTM zone 36S - Projected
+- `Temporal Coverage`: Unknown, presumed 2023
+- `Temporal Resolution`: Not applicable
+- `Lineage`: Sourced from the shared data from the original authors, presumed to be namely Justin Lucas.
+- `Distribution`: Shared by original authors
+- `Constraints`: Unknown
+- `Data Quality`: No planned quality assessment.
+- `Variables`: The shapefile is filled with a Simple Fill and has no land cover data.
+
+#### Bounding Box
+
+- `Abstract`: This is a shapefile which was "used to create [a] buffer to prevent edge effects", per Justin Lucas. It extends past the boundaries of adjusted_studysite when the shapefiles are visualized together.
+- `Label`: bounding_box.shp
+- `Spatial Coverage`: The data source pertains to land surrounding Makuyuni Wildlife Corridor and the corridor itself.
+- `Spatial Resolution`: Unknown
+- `Spatial Extent`: 833295.2141958434367552,9585634.2357019279152155 : 860913.8547548535279930,9617039.8727052193135023
+- `Spatial Reference System`: EPSG:32736 - WGS 84 / UTM zone 36S
+- `Temporal Coverage`: Unknown, presumed 2023
+- `Temporal Resolution`: Not applicable
+- `Lineage`: Sourced from the shared data from the original authors, presumed to be namely Justin Lucas.
+- `Distribution`: Shared by original authors
+- `Constraints`: Unknown
+- `Data Quality`: No planned quality assessment.
+- `Variables`: The shapefile is filled with a Simple Fill and has no land cover data.
+
+#### Secondary Roads
+
+- `Abstract`: This is a shapefile which is described as containing "all tracks and roads that were within the study area aside from the two major highways" by Justin Lucas. The shapefile contains line geometries and has 176 total features.
+- `Label`: secondary_roads.shp
+- `Spatial Coverage`: The data source pertains to land surrounding Makuyuni Wildlife Corridor and the corridor itself.
+- `Spatial Resolution`: Unknown
+- `Spatial Extent`: 4002985.2809690786525607,-417528.5057486270670779 : 4055363.5504161105491221,-386600.4248493338818662
+- `Spatial Reference System`: EPSG:3857 - WGS 84 / Pseudo-Mercator
+- `Temporal Coverage`: Unknown, presumed 2023
+- `Temporal Resolution`: Not applicable
+- `Lineage`: Sourced from the shared data from the original authors, presumed to be namely Justin Lucas. Lucas states that this shapefile was sourced from OpenStreetMap.
+- `Distribution`: Shared by original authors
+- `Constraints`: Unknown
+- `Data Quality`: No planned quality assessment.
+- `Variables`: Roads are filled with a Simple Fill and there are no associated land cover data.
+
+#### Bomas
+
+- `Abstract`: This is a shapefile which ostensibly contains locations of bomas, or livestock enclosures, within the wildlife corridor.
+- `Label`: bomas.shp
+- `Spatial Coverage`: The data source pertains to land within the wildlife corridor.
+- `Spatial Extent`: 4007605.1797135984525084,-412580.2386067652842030 : 4032954.7106412472203374,-387445.8448925596894696
+- `Spatial Reference System`: EPSG:3857 - WGS 84 / Pseudo-Mercator
+- `Temporal Coverage`: Unknown, presumed 2023
+- `Temporal Resolution`: Not applicable
+- `Lineage`: Sourced from the shared data from the original authors, presumed to be namely Justin Lucas. 
+- `Distribution`: Shared by original authors
+- `Constraints`: Unknown
+- `Data Quality`: No planned quality assessment.
+- `Variables`: Bomas are filled with a Simple Fill and there are no associated land cover data.
+
+#### Major Roads
+
+- `Abstract`: This is a shapefile which contains "two highways that run through the study area", per Justin Lucas.
+- `Label`: major_roads_vector.shp
+- `Spatial Coverage`: The data source pertains to the entirety of the extent of the highways, which extend far past the study site and outside of Tanzania to the north and south.
+- `Spatial Extent`: 24.9389406999999999,-33.9686420999999967 : 36.7868238000000005,-1.4968789000000000
+- `Spatial Reference System`: EPSG:4326 - WGS 84
+- `Temporal Coverage`: Unknown, presumed 2023
+- `Temporal Resolution`: Not applicable
+- `Lineage`: Sourced from the shared data from the original authors, presumed to be namely Justin Lucas. Lucas states that this shapefile is sourced from OpenStreetMap. 
+- `Distribution`: Shared by original authors
+- `Constraints`: Unknown
+- `Data Quality`: No planned quality assessment.
+- `Variables`: The highways are filled with a Simple Fill and there are no associated land cover data.
 
 ### Prior observations
 
@@ -170,8 +272,7 @@ Describe how the results are to be interpreted *vis a vis* each hypothesis or re
 
 ## Integrity Statement
 
-Include an integrity statement - The authors of this preregistration state that they completed this preregistration to the best of their knowledge and that no other preregistration exists pertaining to the same hypotheses and research.
-If a prior registration *does* exist, explain the rationale for revising the registration here.
+The authors of this preregistration state that they completed this preregistration to the best of their knowledge and that no other preregistration exists pertaining to the same hypotheses and research.
 
 ## Acknowledgements
 
