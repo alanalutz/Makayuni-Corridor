@@ -23,7 +23,7 @@ library(raster)
 ```
 
 
-2. Clip landcover by bounding_box.
+1. Clip landcover by bounding_box.
 
 landcover (GEOMETRY FILE) [CLIP] initial_clip (GEOMETRY FILE)
 
@@ -54,15 +54,21 @@ lc_study_clip <- mask(crop(landcover, extent(bounds)), bounds)
 plot(lc_study_clip)
 ```
 
-3a. Warp (reproject) output_2a ["lc_study_clip"] to CRS=32736.
+2. Reproject landcover to CRS=32736 and 10m resolution.
 
+Unplanned deviation: used a pixel size of 10m (as specified in the manuscript) as opposed to 70m (as specified in the QGIS model).
 
 Inputs: initial_raster_clip
 Outputs: unnamed_intermediate "initial_raster_clip_proj"
 Possible functions: raster::projectRaster
 ```{r}
 
-lc_study_clip_reproj <- projectRaster(lc_study_clip, crs=32736, filename="lc_study_clip_reproj")
+lc_study_clip_reproj <- projectRaster(lc_study_clip, crs=32736)
+
+#Andy's code:
+pixel_default <- raster(resolution=c(10,10), crs=proj4string(lc_study_clip_reproj), ext=extent(lc_study_clip_reproj))
+
+lc_study_clip_reproj <- resample(lc_study_clip_reproj, pixel_default)
 
 ```
 
@@ -70,9 +76,9 @@ lc_study_clip_reproj <- projectRaster(lc_study_clip, crs=32736, filename="lc_stu
 plot(lc_study_clip_reproj)
 ```
 
-4a. Reclassify landcover by table.
+3. Reclassify landcover by table.
 
-Unplanned deviation: changed reclass table
+Unplanned deviation: changed reclass table to intervals
 
 Inputs: "lc_study_clip"
 Outputs: unnamed intermediate "lc_reclass"
@@ -86,7 +92,7 @@ c2 <- c(0,2,3,4,5,6,7,8,9,255)
 c3 <- c(0,0.75,0.01,0.25,0.01,0.15,1,0.1,0.15,0)
 reclass_table <- as.matrix(data.frame(c1, c2, c3))
 
-lc_reclass <- reclassify(lc_study_clip_reproj, reclass_table, filename="lc_reclass", right=F, overwrite=T)
+lc_reclass <- reclassify(lc_study_clip_reproj, reclass_table, right=F)
 ```
 
 ```{r}
@@ -94,7 +100,7 @@ plot(lc_reclass)
 ```
 
 
-1a. Reproject secondary roads to CRS=32736.
+4. Reproject secondary roads to CRS=32736.
 
 secondary_roads (GEOMETRY FILE) --> [Reproject] to EPSG:32736 - WGS 84 / UTM zone 36S
 
@@ -104,7 +110,7 @@ Possible functions: sf::read_sf, raster::shapefile, st::st_transform
 ```{r}
 secondary_roads <- here("data", "raw", "public", "secondary_roads.shp") %>% st_read()
 
-output_1a <- st_transform(secondary_roads, crs=32736)
+output_1a <- st_transform(secondary_roads, crs=32736) %>% st_crop(st_bbox(lc_study_clip_reproj))
 ```
 
 1b. Rasterize secondary roads.
@@ -127,11 +133,14 @@ st_as_raster <- function(rstars){
                    crs = st_crs(rstars)$proj4string)
 }
 
-secondary_roads_raster <- st_as_raster(secondary_roads_raster) %>% setExtent(extent(lc_study_clip_reproj)) %>% resample(lc_study_clip_reproj)
+secondary_roads_raster <- st_as_raster(secondary_roads_raster) %>% resample(lc_study_clip_reproj)
+
+secondary_roads_raster <- reclassify(secondary_roads_raster, cbind(NA, 0)) %>% reclassify(cbind(1, Inf, 1))
 
 ```
 
 ```{r}
+
 plot(secondary_roads_raster)
 
 ```
@@ -143,7 +152,7 @@ Unplanned deviation: buffer after rasterizing
 ```{r}
 major_roads <- here("data", "raw", "public", "major_roads_vector.shp") %>% st_read()
 
-major_roads_reproj <- major_roads %>% st_transform(crs=32736)
+major_roads_reproj <- major_roads %>% st_transform(crs=32736) %>% st_crop(st_bbox(lc_study_clip_reproj))
 
 major_roads_raster <- st_rasterize(major_roads_reproj)
 
@@ -151,7 +160,9 @@ major_roads_raster <- st_as_raster(major_roads_raster)
 
 major_roads_buff <- major_roads_raster %>% buffer(width=300)
 
-major_roads_raster <- major_roads_buff %>% setExtent(extent(lc_study_clip_reproj)) %>% resample(lc_study_clip_reproj)
+major_roads_raster <- major_roads_buff %>% resample(lc_study_clip_reproj)
+
+major_roads_raster <- reclassify(major_roads_raster, cbind(NA, 0)) %>% reclassify(cbind(1, Inf, 1))
 
 ```
 
@@ -167,40 +178,27 @@ rural <- here("data", "raw", "public", "bomas.shp") %>% st_read()
 
 rural_reproj <- rural %>% st_transform(crs=32736)
 
+rural_raster <- st_rasterize(rural_reproj)
+
+rural_raster <- st_as_raster(rural_raster) %>% resample(lc_study_clip_reproj) %>% setExtent(extent(lc_study_clip_reproj))
+
 ```
 
 ```{r}
-plot(rural_reproj)
+plot(rural_raster)
 
 ```
 
 Buildings
 
 ```{r}
-buildings <- here("data", "raw", "public", "merged_buildings.shp") %>% st_read() %>% st_as_stars()
+buildings <- here("data", "raw", "public", "merged_buildings.shp") %>% st_read()
 
-buildings_reproj <- buildings %>% st_transform(crs=32736)
-
-```
-
-```{r}
-plot(buildings_reproj)
-
-```
-
-Figure out why buildings are not rasterizing properly and why bomas are off
-
-```{r}
+buildings_reproj <- buildings %>% st_transform(crs=32736) %>% st_crop(st_bbox(lc_study_clip_reproj))
 
 buildings_raster <- st_rasterize(buildings_reproj)
 
-buildings_raster <- st_as_raster(buildings_raster) %>% setExtent(extent(lc_study_clip_reproj)) %>% resample(lc_study_clip_reproj)
-
-rural_raster <- st_rasterize(rural_reproj)
-
-rural_raster <- st_as_raster(rural_raster) %>% setExtent(extent(lc_study_clip_reproj)) %>% resample(lc_study_clip_reproj)
-
-merged_buildings <- overlay(buildings_raster, rural_raster, fun=function(x,y){return(x | y)})
+buildings_raster <- st_as_raster(buildings_raster) %>% resample(lc_study_clip_reproj)
 
 ```
 
@@ -209,7 +207,19 @@ plot(buildings_raster)
 
 ```
 
-Figure out why proximity takes so long
+Figure out why buildings are not rasterizing properly
+
+```{r}
+
+merged_buildings <- overlay(buildings_raster, rural_raster, fun=function(x,y){return(x | y)}) %>% reclassify(cbind(1, Inf, 1))
+
+```
+
+```{r}
+plot(merged_buildings)
+
+```
+
 
 ```{r}
 proximity = distance(merged_buildings)
@@ -222,13 +232,17 @@ Reclassify proximity raster
 
 ```{r}
 c1 <- c(0, 1, 50, 100, 150, 200)
-c2 <- c(1, 50, 100, 150, 200, 1000)
+c2 <- c(1, 50, 100, 150, 200, Inf)
 c3 <- c(1, 0.8, 0.6, 0.4, 0.2, 0)
 prox_reclass_table <- as.matrix(data.frame(c1, c2, c3))
 
 prox_reclass <- reclassify(proximity, prox_reclass_table)
 ```
 
+```{r}
+plot(prox_reclass)
+
+```
 
 
 6a. Rasterize buffer zone.
@@ -237,20 +251,61 @@ Inputs: "buffer_region"
 Outputs: unnamed intermediate "buffer_raster"
 Possible functions: raster::raster
 ```{r}
-buffer_zone <- here("data", "raw", "public", "buffer_region") %>% st_read()
+buffer_zone <- here("data", "raw", "public", "buffer_region.shp") %>% st_read()
 
-buffer_raster <- st_rasterize(buffer_zone)
+buffer_reproj <- buffer_zone %>% st_transform(crs=32736) %>% st_crop(st_bbox(lc_study_clip_reproj))
+
+buffer_raster <- st_rasterize(buffer_reproj)
+
+buffer_raster <- st_as_raster(buffer_raster) %>% resample(lc_study_clip_reproj)
+
+buffer_raster <- reclassify(buffer_raster, cbind(1, Inf, 999)) %>% reclassify(cbind(NA, 0))
+
+plot(buffer_raster)
+
 ```
 
+(A+(0.25*B)+C+D+E)/4
+A = major roads
+B = secondary roads
+C = proximity to buildings
+D = landcover
+E = buffer zone
 
+```{r}
+A = major_roads_raster
+B = secondary_roads_raster
+C = prox_reclass
+D = lc_reclass
+E = buffer_raster
 
+cost <- (A+(0.25*B)+C+D+E)/4
 
+plot(cost)
 
+```
 
-7. 
+Issues:
 
+- buildings don't rasterize
+- secondary roads are too thick (70m resolution)
+- should everything be in 10m resolution?
+- workflow doesn't show accumulated cost
 
+Compare to cost surface in the google drive (subtract)
 
+```{r}
+compare <- here("data", "derived", "public", "DD_Cost_6.tif") %>% raster()
 
+compare <- compare %>% resample(pixel_default)
+cost <- cost %>% resample(pixel_default)
 
+diff <- overlay(compare,cost,
+                      fun=function(compare, cost){return(compare-cost)}, filename="difference")
+plot(diff)
+```
 
+Differences:
+
+- buildings (because we couldn't rasterize them)
+- secondary roads are too wide
