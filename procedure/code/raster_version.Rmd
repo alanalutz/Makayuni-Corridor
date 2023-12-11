@@ -121,7 +121,14 @@ Inputs: "output_1a"
 Outputs: unnamed intermediate "secondary_roads_raster"
 Possible functions: stars::st_rasterize
 ```{r}
-secondary_roads_raster <- st_rasterize(output_1a)
+# From Malcomb reproduction
+b = st_bbox(st_bbox(lc_study_clip_reproj), crs=st_crs(32736)) %>% st_as_sfc()
+
+blank <- st_as_stars(b, dx=10, dy=10)
+blank[[1]][]=NA
+
+secondary_roads_raster <- st_rasterize(output_1a, template=blank)
+#write_stars(secondary_roads_raster, "secondary_roads_raster.tif")
 
 #Takes as an input a stars raster layer
 #CJ Brown 2020-05-18
@@ -133,7 +140,9 @@ st_as_raster <- function(rstars){
                    crs = st_crs(rstars)$proj4string)
 }
 
-secondary_roads_raster <- st_as_raster(secondary_roads_raster) %>% resample(lc_study_clip_reproj)
+secondary_roads_raster <- st_as_raster(secondary_roads_raster)
+
+secondary_roads_raster <- resample(secondary_roads_raster, lc_study_clip_reproj)
 
 secondary_roads_raster <- reclassify(secondary_roads_raster, cbind(NA, 0)) %>% reclassify(cbind(1, Inf, 1))
 
@@ -154,7 +163,7 @@ major_roads <- here("data", "raw", "public", "major_roads_vector.shp") %>% st_re
 
 major_roads_reproj <- major_roads %>% st_transform(crs=32736) %>% st_crop(st_bbox(lc_study_clip_reproj))
 
-major_roads_raster <- st_rasterize(major_roads_reproj)
+major_roads_raster <- st_rasterize(major_roads_reproj, template=blank)
 
 major_roads_raster <- st_as_raster(major_roads_raster)
 
@@ -178,7 +187,7 @@ rural <- here("data", "raw", "public", "bomas.shp") %>% st_read()
 
 rural_reproj <- rural %>% st_transform(crs=32736)
 
-rural_raster <- st_rasterize(rural_reproj)
+rural_raster <- st_rasterize(rural_reproj, template=blank)
 
 rural_raster <- st_as_raster(rural_raster) %>% resample(lc_study_clip_reproj) %>% setExtent(extent(lc_study_clip_reproj))
 
@@ -196,7 +205,7 @@ buildings <- here("data", "raw", "public", "merged_buildings.shp") %>% st_read()
 
 buildings_reproj <- buildings %>% st_transform(crs=32736) %>% st_crop(st_bbox(lc_study_clip_reproj))
 
-buildings_raster <- st_rasterize(buildings_reproj)
+buildings_raster <- st_rasterize(buildings_reproj, template=blank)
 
 buildings_raster <- st_as_raster(buildings_raster) %>% resample(lc_study_clip_reproj)
 
@@ -255,7 +264,7 @@ buffer_zone <- here("data", "raw", "public", "buffer_region.shp") %>% st_read()
 
 buffer_reproj <- buffer_zone %>% st_transform(crs=32736) %>% st_crop(st_bbox(lc_study_clip_reproj))
 
-buffer_raster <- st_rasterize(buffer_reproj)
+buffer_raster <- st_rasterize(buffer_reproj, template=blank)
 
 buffer_raster <- st_as_raster(buffer_raster) %>% resample(lc_study_clip_reproj)
 
@@ -289,7 +298,6 @@ Issues:
 
 - buildings don't rasterize
 - secondary roads are too thick (70m resolution)
-- should everything be in 10m resolution?
 - workflow doesn't show accumulated cost
 
 Compare to cost surface in the google drive (subtract)
