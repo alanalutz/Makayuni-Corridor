@@ -73,7 +73,7 @@ We will reproduce the author's original methodology as closely as possible using
 R version 4.3.2 (2023-10-31)\
 Platform: x86_64-apple-darwin20 (64-bit)\
 Running under: macOS Sonoma 14.1.2\
-Hardware: MacBook Pro 2019, 1.4 GHz Quad-Core Intel Core i5\
+Hardware: MacBook Pro 2019, 1.4 GHz Quad-Core Intel Core i5
 
 Packages:
 
@@ -83,7 +83,7 @@ sf_1.0-14\
 stars_0.6-4\
 raster_3.6-26\
 groundhog_3.1.2\
-conflicted_1.2.0\
+conflicted_1.2.0
 
 ### Data and variables
 
@@ -267,16 +267,11 @@ Here is a brief overview of the steps in this workflow:
 
 6.  Aggregate cost layers into a single cost surface using the formula (A+(0.25\*B)+C+D+E)/4
 
-    Where:
-
-    A = Major roads
-
-    B = Secondary roads
-
-    C = Proximity to buildings
-
-    D = Landcover
-
+    Where:\
+    A = Major roads\
+    B = Secondary roads\
+    C = Proximity to buildings\
+    D = Landcover\
     E = Buffer zone
 
 ## Results
