@@ -93,6 +93,9 @@ Each of the next subsections describes one data source.
 
 #### Land Cover
 
+**Note:** This file size of this raster is too large to be uploaded to GitHub.
+It must be downloaded from the original authors.
+
 -   `Abstract`: A raster of classified landcover for the entire country of Tanzania.
 -   `Label`: landcover.tif
 -   `Spatial Coverage`: Tanzania
