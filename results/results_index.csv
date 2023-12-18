@@ -1,1 +1,3 @@
 ﻿path,name,description
+figures,reproduced_cost_surface.grd,"Aggregated cost surface of Makayuni Corridor, created by the reproduction"
+figures,cost_difference.grd,Difference between original and reproduced cost surfaces

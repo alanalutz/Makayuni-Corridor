@@ -1,0 +1,798 @@
+---
+title: "Makayuni_Corridor.Rmd"
+author: "Alana Lutz and Andy Atallah"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options:
+  markdown:
+    wrap: sentence
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_dir = "../../docs") })
+---
+
+## Authors
+
+-   Emmanuel H. Lyimo^1^\*, [lyimo.emanuel\@gmail.com](mailto:lyimo.emanuel@gmail.com){.email}, [ORCID link](https://orcid.org/0000-0002-5750-8636)
+-   Gabriel M. Mayengo^1^, [mayengogabriel\@gmail.com](mailto:mayengogabriel@gmail.com){.email}
+-   David J. Castico^2^, [davidcastico\@gmail.com](mailto:davidcastico@gmail.com){.email}
+-   Damian Nguma^3^, [damiannguma\@gmail.com](mailto:damiannguma@gmail.com){.email}
+-   Kwaslema M. Hariohay^1^, [kwaslema2000\@gmail.com](mailto:kwaslema2000@gmail.com){.email}
+-   Alex W. Kisingo^1^, [alexkisingo\@gmail.com](mailto:alexkisingo@gmail.com){.email}
+-   Justin Lucas^4^
+-   Niwaeli Kimambo^4^
+-   Joseph Holler^4^
+-   Alana Lutz^4^
+-   Andy Atallah^4^
+
+^1^ College of African Wildlife Management, Mweka.
+P.O Box 3031, Moshi, Tanzania
+
+^2^Tanzania People and Wildlife, P.O Box 11306, Arusha, Tanzania
+
+^3^ Tanzania Wildlife Research Institute, P.O Box 661, Arusha, Tanzania
+
+^4^ Middlebury College, Middlebury, Vermont 05753, USA
+
+\* Corresponding author and creator
+
+# Abstract
+
+This study is a reproduction of unpublished research by Lyimo et al (2023), titled: Makuyuni Wildlife Corridor: Analysis of the Effects of Socioecological Interactions and Changing Land Use on Movement Patterns of Large Mammal Species.
+The original study evaluated the connectivity of Makuyuni Wildlife Corridor, a stretch of unprotected land between Tarangire National Park and Essmingor National Forest Reserve in Tanzania.
+We reproduce the first part of the study, a multifactor analysis model that approximates cost of movement through the corridor based on least cost pathway analysis.
+The study was originally conducted using the QGIS Model Builder, and we reproduce the workflow in R.
+The goal of the study is to reproduce the authors' map displaying the minimum cost of movement through each point in the study area, compare the reproduced map to the original map, and evaluate why the reproduction differs from the original.
+
+# Study metadata
+
+-   `Key words`: multifactor analysis, least cost pathway, wildlife corridor, movement cost, Makayuni, Tarangire, Essmingor, Tanzania
+-   `Subject`: Social and Behavioral Sciences: Geography: Nature and Society Relations
+-   `Date created`: 11-30-2023
+-   `Date modified`: 11-30-2023
+-   `Spatial Coverage`: Makayuni Wildlife Corridor, Tanzania
+-   `Spatial Resolution`: 10m
+-   `Spatial Reference System`: EPSG 32736
+-   `Temporal Coverage`: 2023
+-   `Temporal Resolution`: N/A
+
+## Original study spatio-temporal metadata
+
+Because this is a reproduction study, the original study spatio-temporal metadata is identical to the study metadata.
+
+# Study design
+
+This study is a reproduction of an original observational study that created a cost surface of wildlife movement in Makayuni Wildlife Corridor.
+We aim to reproduce the original study's Figure 5, a map of the cost surface, in the R computational environment rather than the QGIS Model Builder environment used by the original authors.
+The null hypothesis is that there are no differences between the reproduced cost surface map and the original cost surface map.
+The alternative hypothesis is that there are differences between the reproduced cost surface map and the original cost surface map.
+We test this hypothesis by subtracting the reproduced map from the original to identify areas of difference.
+
+# Materials and procedure
+
+## Computational environment
+
+```{r environment-setup, include = FALSE}
+# record all the packages you are using here
+# this includes any calls to library(), require(),
+# and double colons such as here::i_am()
+packages <- c("tidyverse", "here", "sf", "stars", "raster", "tmap")
+
+# force all conflicts to become errors
+# if you load dplyr and use filter(), R has to guess whether you mean dplyr::filter() or stats::filter()
+# the conflicted package forces you to be explicit about this
+# disable at your own peril
+# https://conflicted.r-lib.org/
+require(conflicted)
+
+# load and install required packages
+# https://groundhogr.com/
+if (!require(groundhog)) {
+  install.packages("groundhog")
+  require(groundhog)
+}
+
+# this date will be used to determine the versions of R and your packages
+# it is best practice to keep R and its packages up to date
+groundhog.day <- "2023-12-01"
+set.groundhog.folder("../../data/scratch/groundhog/")
+
+# this replaces any library() or require() calls
+groundhog.library(packages, groundhog.day)
+# you may need to install a correct version of R
+# you may need to respond OK in the console to permit groundhog to install packages
+# you may need to restart R and rerun this code to load installed packages
+# In RStudio, restart r with Session -> Restart Session
+
+# record the R processing environment
+# alternatively, use devtools::session_info() for better results
+writeLines(
+  capture.output(sessionInfo()),
+  here("procedure", "environment", paste0("r-environment-", Sys.Date(), ".txt"))
+)
+
+# save package citations
+knitr::write_bib(c(packages, "base"), file = here("software.bib"))
+
+# set up default knitr parameters
+# https://yihui.org/knitr/options/
+knitr::opts_chunk$set(
+  echo = FALSE, # Run code, show outputs (don't show code)
+  fig.retina = 4,
+  fig.width = 8,
+  fig.path = paste0(here("results", "figures"), "/")
+)
+```
+
+## Data and variables
+
+Secondary data sources for the study are to include land cover, buffer region, merged buildings, initial clip, bounding box, secondary roads, bomas, and major roads.
+
+Each of the next subsections describes one data source.
+
+#### Land Cover
+
+-   `Abstract`: A raster of classified landcover for the entire country of Tanzania.
+-   `Label`: landcover.tif
+-   `Spatial Coverage`: Tanzania
+-   `Spatial Resolution`: 4.78m
+-   `Spatial Reference System`: EPSG 3857
+-   `Temporal Coverage`: 2023
+-   `Lineage`: (Song et al 2023)[<https://doi.org/10.1016/j.jag.2022.103152>]
+-   `Distribution`: Shared by original authors
+-   `Bands`: 1
+    -   `Label`: Landcover
+    -   `Definition`: Classified landcover type using satellite imagery
+    -   `Type`: integer
+    -   `Accuracy`: e.g. uncertainty of measurements
+    -   `Domain`: 0-8
+    -   `Values`:
+        -   1 (orange): cropland
+        -   2 (dark green): forest/dense tree
+        -   3 (light green): grassland
+        -   4 (green): shrubland
+        -   5 (blue): water
+        -   6 (gray): built-up
+        -   7 (yellow): bareland
+        -   8 (teal): wetlands
+
+#### Buffer Region
+
+-   `Abstract`: Buffer region used to avoid edge effects
+-   `Label`: buffer_region.shp
+-   `Spatial Coverage`: 833295.2141958434367552,9585634.2357019279152155 : 860913.8547548535279930,9617039.8727052193135023
+-   `Spatial Reference System`: EPSG 32736
+-   `Lineage`: Sourced from the shared data from the original authors, presumed to be namely Justin Lucas.
+-   `Distribution`: Shared by original authors
+-   `Constraints`: Unknown
+-   `Data Quality`: No planned quality assessment.
+
+#### Merged Buildings
+
+-   `Abstract`: Microsoft and OSM buildings combined
+-   `Label`: merged_buildings.shp
+-   `Spatial Coverage`: 4007553.8440031828358769,-414102.9735587749746628 : 4033053.2097658971324563,-387288.0955167215433903
+-   `Spatial Reference System`: EPSG 3857
+-   `Lineage`: Sourced from the shared data from the original authors, presumed to be namely Justin Lucas.
+-   `Distribution`: Shared by original authors
+-   `Constraints`: Unknown
+-   `Data Quality`: No planned quality assessment.
+
+#### Initial Clip
+
+-   `Abstract`: Shapefile used to initially clip landcover map, larger than study area and bounding box
+-   `Label`: initial clip.shp
+-   `Spatial Coverage`: 830767.7591739012859762,9581072.9865449033677578 : 862007.9419027733383700,9619914.2523989714682102
+-   `Spatial Reference System`: EPSG 32736
+-   `Lineage`: Sourced from the shared data from the original authors, presumed to be namely Justin Lucas.
+-   `Distribution`: Shared by original authors
+-   `Constraints`: Unknown
+-   `Data Quality`: No planned quality assessment.
+
+#### Bounding Box
+
+-   `Abstract`: This is a shapefile which was "used to create [a] buffer to prevent edge effects", per Justin Lucas. It extends past the boundaries of adjusted_studysite when the shapefiles are visualized together.
+-   `Label`: bounding_box.shp
+-   `Spatial Coverage`: The data source pertains to land surrounding Makuyuni Wildlife Corridor and the corridor itself.
+-   `Spatial Resolution`: Unknown
+-   `Spatial Extent`: 833295.2141958434367552,9585634.2357019279152155 : 860913.8547548535279930,9617039.8727052193135023
+-   `Spatial Reference System`: EPSG:32736 - WGS 84 / UTM zone 36S
+-   `Temporal Coverage`: Unknown, presumed 2023
+-   `Temporal Resolution`: Not applicable
+-   `Lineage`: Sourced from the shared data from the original authors, presumed to be namely Justin Lucas.
+-   `Distribution`: Shared by original authors
+-   `Constraints`: Unknown
+-   `Data Quality`: No planned quality assessment.
+-   `Variables`: The shapefile is filled with a Simple Fill and has no land cover data.
+
+#### Secondary Roads
+
+-   `Abstract`: This is a shapefile which is described as containing "all tracks and roads that were within the study area aside from the two major highways" by Justin Lucas. The shapefile contains line geometries and has 176 total features.
+-   `Label`: secondary_roads.shp
+-   `Spatial Coverage`: The data source pertains to land surrounding Makuyuni Wildlife Corridor and the corridor itself.
+-   `Spatial Resolution`: Unknown
+-   `Spatial Extent`: 4002985.2809690786525607,-417528.5057486270670779 : 4055363.5504161105491221,-386600.4248493338818662
+-   `Spatial Reference System`: EPSG:3857 - WGS 84 / Pseudo-Mercator
+-   `Temporal Coverage`: Unknown, presumed 2023
+-   `Temporal Resolution`: Not applicable
+-   `Lineage`: Sourced from the shared data from the original authors, presumed to be namely Justin Lucas. Lucas states that this shapefile was sourced from OpenStreetMap.
+-   `Distribution`: Shared by original authors
+-   `Constraints`: Unknown
+-   `Data Quality`: No planned quality assessment.
+-   `Variables`: Roads are filled with a Simple Fill and there are no associated land cover data.
+
+#### Bomas
+
+-   `Abstract`: This is a shapefile which ostensibly contains locations of bomas, or livestock enclosures, within the wildlife corridor.
+-   `Label`: bomas.shp
+-   `Spatial Coverage`: The data source pertains to land within the wildlife corridor.
+-   `Spatial Extent`: 4007605.1797135984525084,-412580.2386067652842030 : 4032954.7106412472203374,-387445.8448925596894696
+-   `Spatial Reference System`: EPSG:3857 - WGS 84 / Pseudo-Mercator
+-   `Temporal Coverage`: Unknown, presumed 2023
+-   `Temporal Resolution`: Not applicable
+-   `Lineage`: Sourced from the shared data from the original authors, presumed to be namely Justin Lucas.
+-   `Distribution`: Shared by original authors
+-   `Constraints`: Unknown
+-   `Data Quality`: No planned quality assessment.
+-   `Variables`: Bomas are filled with a Simple Fill and there are no associated land cover data.
+
+#### Major Roads
+
+-   `Abstract`: This is a shapefile which contains "two highways that run through the study area", per Justin Lucas.
+-   `Label`: major_roads_vector.shp
+-   `Spatial Coverage`: The data source pertains to the entirety of the extent of the highways, which extend far past the study site and outside of Tanzania to the north and south.
+-   `Spatial Extent`: 24.9389406999999999,-33.9686420999999967 : 36.7868238000000005,-1.4968789000000000
+-   `Spatial Reference System`: EPSG:4326 - WGS 84
+-   `Temporal Coverage`: Unknown, presumed 2023
+-   `Temporal Resolution`: Not applicable
+-   `Lineage`: Sourced from the shared data from the original authors, presumed to be namely Justin Lucas. Lucas states that this shapefile is sourced from OpenStreetMap.
+-   `Distribution`: Shared by original authors
+-   `Constraints`: Unknown
+-   `Data Quality`: No planned quality assessment.
+-   `Variables`: The highways are filled with a Simple Fill and there are no associated land cover data.
+
+## Prior observations
+
+At the time of the study preregistration, the authors had no prior knowledge of the geography of the study region with regards to the phenomena to be studied.
+This study is not related to prior studies by the authors.
+For each data source, the authors had engaged with the data only by inspecting the metadata and observing the layers in QGIS before beginning the reproduction.
+
+## Bias and threats to validity
+
+There are several possible geographic threats to validity in a wildlife corridor analysis.
+The primary threat is boundary distortion, also known as edge effects.
+This issue may be addressed by using a buffer region around the study area, and assigning this buffer a high cost.
+This method will prevent unrealistic low-cost pathways from forming around the edge of the study area.
+
+A second threat is space-time interactions.
+Wildlife movement patterns and landscape characteristics can change over time, especially over the course of a year, due to seasonal variations.
+Corridor analyses that do not take into account temporal considerations may not accurately capture these dynamics.
+This threat to validity will be difficult to address without additional temporal data that accounts for changing movement behaviors or landscape characteristics.
+
+## Data transformations
+
+All necessary data transformations will be performed in the main analysis.
+
+## Analysis
+
+1a.
+Clip landcover by bounding box.
+
+Inputs: landcover, bounding_box
+
+Outputs: lc_study_clip
+
+QGIS workflow step: Clip landcover by study site
+
+**Unplanned deviation:** We decided not to clip landcover to initial_clip.shp before clipping to bounding_box, as this seemed to be an unnecessary step in the workflow.
+We also chose to clip landcover before reprojecting, as the original raster was too large to efficiently reproject.
+
+```{r}
+# Load landcover
+landcover <- here("data", "raw", "public", "landcover.tif") %>% raster()
+# Load bounding box
+bounds <- here("data", "raw", "public", "bounding_box.shp") %>% st_read()
+
+# Reproject bounding box to landcover CRS
+bounds <- bounds %>% st_transform(proj4string(landcover))
+
+# Clip landcover to bounding box
+lc_study_clip <- mask(crop(landcover, extent(bounds)), bounds)
+```
+
+1b.
+Reproject landcover.
+
+Inputs: lc_study_clip
+
+Outputs: lc_study_clip_reproj
+
+QGIS workflow step: Warp (reproject) landcover
+
+We chose a resolution of 10m for all inputs to the cost model, as specified in the original study manuscript.
+This resolution was not specified in the QGIS model, but instead set as a modifiable parameter.
+
+```{r}
+# Reproject landcover to EPSG 32736
+lc_study_clip_reproj <- projectRaster(lc_study_clip, crs=32736)
+
+# Create a template raster with the desired resolution, projection, and extent
+# Code written by Andy Atallah
+pixel_default <- raster(resolution=c(10,10), crs=proj4string(lc_study_clip_reproj), ext=extent(lc_study_clip_reproj))
+
+# Resample landcover to 10m resolution
+lc_study_clip_reproj <- resample(lc_study_clip_reproj, pixel_default)
+```
+
+1c.
+Reclassify landcover.
+
+Inputs: lc_study_clip_reproj
+
+Outputs: lc_reclass
+
+QGIS workflow step: Reclassify landcover by table
+
+**Unplanned deviation:** We changed the reclassification table to intervals to account for the decimal values in the landcover raster.
+The original reclassification table in the QGIS model only reclassifed integers.
+
+```{r}
+# Create 3x10 table of values with which to reclassify
+# Data source: QGIS model
+c1 <- c(0,1,2,3,4,5,6,7,8,9)
+c2 <- c(0,2,3,4,5,6,7,8,9,255)
+c3 <- c(0,0.75,0.01,0.25,0.01,0.15,1,0.1,0.15,0)
+reclass_table <- as.matrix(data.frame(c1, c2, c3))
+
+# Reclassify landcover using the reclass table
+lc_reclass <- reclassify(lc_study_clip_reproj, reclass_table, right=F)
+
+# Save raster as intermediate output (derived data)
+writeRaster(lc_reclass, filename=here("data", "derived", "public", "landcover_cost"), overwrite=T)
+```
+
+Figure 1.
+Visualize land cover cost raster.
+
+```{r}
+tmap_mode("view")
+tm_shape(lc_reclass) + tm_raster(title="Land Cover Costs")
+```
+
+2a.
+Reproject secondary roads.
+
+Inputs: secondary_roads
+
+Outputs: secondary_roads_reproj
+
+QGIS workflow step: Reproject secondary roads
+
+```{r}
+# Load secondary roads shapefile
+secondary_roads <- here("data", "raw", "public", "secondary_roads.shp") %>% st_read()
+
+# Reproject secondary roads to EPSG 32736
+secondary_roads_reproj <- st_transform(secondary_roads, crs=32736)
+```
+
+2b.
+Rasterize secondary roads.
+
+Inputs: secondary_roads_reproj
+
+Outputs: secondary_roads_raster
+
+QGIS workflow step: Rasterize secondary roads
+
+```{r}
+# Clip secondary roads to study area
+secondary_roads_reproj <- secondary_roads_reproj %>% st_crop(st_bbox(lc_study_clip_reproj))
+
+# Create blank raster with desired extent, CRS, and resolution
+# Code adapted from Joseph Holler in his reproduction of Malcomb et al.
+b = st_bbox(st_bbox(lc_study_clip_reproj), crs=st_crs(32736)) %>% st_as_sfc()
+blank <- st_as_stars(b, dx=10, dy=10)
+blank[[1]][]=NA
+
+# Rasterize secondary roads using blank raster as a template
+secondary_roads_raster <- st_rasterize(secondary_roads_reproj, template=blank)
+
+# Function that converts a raster in the stars package to a raster in the raster package
+# Code taken with permission from CJ Brown, 2020-05-18
+st_as_raster <- function(rstars){
+  rext <- st_bbox(rstars)
+  raster(t(rstars[[1]]), xmn = rext[1], xmx = rext[3],
+                   ymn = rext[2], ymx=rext[4],
+                   crs = st_crs(rstars)$proj4string)
+}
+
+# Use function to convert to a raster in the raster package
+secondary_roads_raster <- st_as_raster(secondary_roads_raster)
+
+# Resample to 10m resolution
+secondary_roads_raster <- resample(secondary_roads_raster, lc_study_clip_reproj)
+
+# Reclassify to binary (1 = road, 0 = no road)
+secondary_roads_raster <- reclassify(secondary_roads_raster, cbind(NA, 0)) %>% reclassify(cbind(1, Inf, 1))
+
+# Save raster as intermediate output (derived data)
+writeRaster(secondary_roads_raster, filename=here("data", "derived", "public", "secondary_roads_cost"), overwrite=T)
+```
+
+Figure 2.
+Visualize secondary roads cost raster.
+
+```{r}
+tm_shape(secondary_roads_raster) + tm_raster(title="Secondary Roads Cost", breaks=c(0,1,1), labels=c('0','1'))
+```
+
+3a.
+Reproject major roads
+
+Inputs: major_roads
+
+Outputs: major_roads_reproj
+
+QGIS workflow step: Reproject major roads
+
+```{r}
+# Load major roads shapefile
+major_roads <- here("data", "raw", "public", "major_roads_vector.shp") %>% st_read()
+
+# Reproject to EPSG 32736
+major_roads_reproj <- major_roads %>% st_transform(crs=32736)
+```
+
+3b.
+Rasterize major roads.
+
+Inputs: major_roads_reproj
+
+Outputs: major_roads_raster
+
+QGIS workflow step: Rasterize major roads
+
+**Unplanned deviation:** We rasterized major roads before buffering, due to easy of functionality within the stars and raster packages.
+The original QGIS model buffered roads before rasterizing.
+
+```{r}
+# Clip to study area
+major_roads_reproj<- major_roads_reproj %>% st_crop(st_bbox(lc_study_clip_reproj))
+
+# Rasterize, using the same template raster from before
+major_roads_raster <- st_rasterize(major_roads_reproj, template=blank)
+
+# Convert to a raster in the raster package
+major_roads_raster <- st_as_raster(major_roads_raster)
+```
+
+3c.
+Buffer major roads.
+
+Inputs: major_roads_raster
+
+Outputs: major_roads_buff
+
+QGIS workflow step: Buffer major roads
+
+```{r}
+# Buffer roads by 300m
+major_roads_buff <- major_roads_raster %>% buffer(width=300)
+
+# Resample to resolution of landcover
+major_roads_buff <- major_roads_buff %>% resample(lc_study_clip_reproj)
+
+# Reclassify to binary (1 = road, 0 = no road)
+major_roads_buff <- reclassify(major_roads_buff, cbind(NA, 0)) %>% reclassify(cbind(1, Inf, 1))
+
+# Save raster as intermediate output (derived data)
+writeRaster(major_roads_buff, filename=here("data", "derived", "public", "buffered_roads_cost"), overwrite=T)
+```
+
+Figure 3.
+Visualize major roads cost raster.
+
+```{r}
+tm_shape(major_roads_buff) + tm_raster(title="Buffered Major Roads Cost", breaks=c(0,1,1), labels=c('0','1'))
+```
+
+4a.
+Reproject rural settlements.
+
+Inputs: bomas
+
+Outputs: rural_reproj
+
+QGIS workflow step: Reproject rural
+
+```{r}
+# Load rural settlements ("bomas") shapefile
+rural <- here("data", "raw", "public", "bomas.shp") %>% st_read()
+
+# Reproject to EPSG 32736, fix geometries, and clip to study area
+rural_reproj <- rural %>% st_transform(crs=32736) %>% st_make_valid() %>% st_crop(st_bbox(lc_study_clip_reproj))
+```
+
+4b.
+Reproject buildings.
+
+Inputs: merged_buildings
+
+Outputs: buildings_reproj
+
+QGIS workflow step: Reproject buildings
+
+```{r}
+# Load buildings shapefile
+buildings <- here("data", "raw", "public", "merged_buildings.shp") %>% st_read()
+
+# Reproject to EPSG 32736 and clip to study area
+buildings_reproj <- buildings %>% st_transform(crs=32736) %>% st_crop(st_bbox(lc_study_clip_reproj))
+```
+
+4c.
+Merge rural settlements and buildings.
+
+Inputs: rural_reproj, buildings_reproj
+
+Outputs: merged
+
+QGIS workflow step: Merge vector layers
+
+```{r}
+# Code shared by Andy Atallah and Joseph Holler
+
+# Select just the geometry columns
+rural_reproj <- rural_reproj[,2]
+buildings_reproj <- buildings_reproj[,c(13)]
+
+# Bind rows together
+merged <- bind_rows(rural_reproj, buildings_reproj)
+```
+
+4d.
+Rasterize merged buildings.
+
+Inputs: merged
+
+Outputs: merged_raster
+
+QGIS workflow step: Rasterize buildings
+
+```{r}
+# Rasterize the merged layer, using the blank raster from before as a template
+merged_raster <- st_rasterize(merged, template=blank)
+
+# Convert to raster in the raster package, resample to landcover resolution, and set extent of study area
+merged_raster <- st_as_raster(merged_raster) %>% resample(lc_study_clip_reproj) %>% setExtent(extent(lc_study_clip_reproj))
+```
+
+Figure 4.
+Visualize buildings.
+
+```{r}
+tm_shape(merged_raster) + tm_raster(palette='blue', legend.show=F) + tm_layout(title="Merged Buildings")
+```
+
+4e.
+Create building proximity raster.
+
+Inputs: merged_raster
+
+Outputs: proximity
+
+QGIS workflow step: Proximity raster
+
+```{r}
+proximity <- distance(merged_raster)
+
+# Save raster as intermediate output (derived data)
+writeRaster(proximity, filename=here("data", "derived", "public", "building_proximity"), overwrite=T)
+```
+
+Figure 5.
+Visualize proximity raster.
+
+```{r}
+tm_shape(proximity) + tm_raster(palette='PuBuGn', title="Proximity to Buildings (m)",
+                                breaks= c(0, 200, 500, 1000, 2000, 3000, 4000, 5000, Inf))
+```
+
+4f.
+Reclassify building proximity raster.
+
+Inputs: proximity
+
+Outputs: prox_reclass
+
+QGIS workflow step: Reclassify proximity raster by table
+
+```{r}
+# Create reclassification table: each distance range is assigned a different cost
+c1 <- c(0, 1, 50, 100, 150, 200)
+c2 <- c(1, 50, 100, 150, 200, Inf)
+c3 <- c(1, 0.8, 0.6, 0.4, 0.2, 0)
+prox_reclass_table <- as.matrix(data.frame(c1, c2, c3))
+
+# Reclassify the proximity raster using the reclassification table
+prox_reclass <- reclassify(proximity, prox_reclass_table, right=F)
+
+# Save raster as intermediate output (derived data)
+writeRaster(prox_reclass, filename=here("data", "derived", "public", "building_proximity_cost"), overwrite=T)
+```
+
+Figure 6.
+Visualize building proximity cost raster.
+
+```{r}
+tm_shape(prox_reclass) + tm_raster(title="Building Proximity Costs",
+                                breaks= c(0, 0.2, 0.4, 0.6, 0.8, 1),
+                                labels=c('0', '0.2', '0.4', '0.6', '0.8', '1'))
+```
+
+5.  Rasterize buffer zone.
+
+Inputs: buffer_region
+
+Outputs: buffer_raster
+
+QGIS workflow step: Rasterize buffer zone
+
+```{r}
+# Load buffer zone shapefile
+buffer_zone <- here("data", "raw", "public", "buffer_region.shp") %>% st_read()
+
+# Reproject buffer zone to EPSG 32736 and clip to study area
+buffer_reproj <- buffer_zone %>% st_transform(crs=32736) %>% st_crop(st_bbox(lc_study_clip_reproj))
+
+# Rasterize buffer zone using the blank raster as a template
+buffer_raster <- st_rasterize(buffer_reproj, template=blank)
+
+# Convert to a raster in the raster package and resample to landcover resolution
+buffer_raster <- st_as_raster(buffer_raster) %>% resample(lc_study_clip_reproj)
+
+# Reclassify to a value of 999 (high cost)
+buffer_raster <- reclassify(buffer_raster, cbind(1, Inf, 999)) %>% reclassify(cbind(NA, 0))
+
+# Save raster as intermediate output (derived data)
+writeRaster(buffer_raster, filename=here("data", "derived", "public", "buffer_cost"), overwrite=T)
+```
+
+Figure 7.
+Visualize buffer zone cost.
+
+```{r}
+tm_shape(buffer_raster) + tm_raster(title="Buffer Zone Cost",
+                                breaks= c(0, 999, 999),
+                                labels=c('0', '999'))
+```
+
+6.  Calculate cost surface.
+
+Inputs: major_roads_buff, secondary_roads_raster, prox_reclass, lc_reclass, buffer_raster
+
+Outputs: cost
+
+QGIS workflow step: Raster calculator cost
+
+Cost is calculated using the following formula: (A+(0.25\*B)+C+D+E)/4
+
+Where:
+
+A = Major roads
+
+B = Secondary roads
+
+C = Proximity to buildings
+
+D = Landcover
+
+E = Buffer zone
+
+```{r}
+A <- major_roads_buff
+B <- secondary_roads_raster
+C <- prox_reclass
+D <- lc_reclass
+E <- buffer_raster
+
+cost <- (A+(0.25*B)+C+D+E)/4
+
+# Save raster as results figure
+writeRaster(cost, filename=here("results", "figures", "reproduced_cost_surface"), overwrite=T)
+```
+
+7.  Compare to cost surface produced by the original study.
+
+Inputs: cost, DD_cost_6.tif
+
+Outputs: diff
+
+```{r}
+# Load cost surface from original study
+compare <- here("data", "derived", "public", "DD_Cost_6.tif") %>% raster()
+
+# Align original cost raster with reproduced cost raster
+compare <- compare %>% resample(pixel_default)
+cost <- cost %>% resample(pixel_default)
+
+# Subtract reproduced cost raster from original cost raster for comparison
+diff <- overlay(compare,cost,
+                      fun=function(compare, cost){return(compare-cost)}, filename="difference", overwrite=T)
+
+# Save raster as results figure
+writeRaster(diff, filename=here("results", "figures", "cost_difference"), overwrite=T)
+```
+
+# Results
+
+Figure 8.
+Visualize reproduced cost surface.
+
+```{r}
+tm_shape(cost) + tm_raster(palette='viridis', title="Reproduced Cost Surface",
+                           breaks= c(0, 0.1, 0.2, 0.4, 0.6, 0.8, 1, 999))
+```
+
+As expected, the highest costs (other than the buffer region) occur in areas around roads and settlements.
+Landcover does not appear to play as important of a role in movement cost.
+
+Figure 9.
+Visualize differences between reproduced and original cost rasters.
+
+```{r}
+tm_shape(diff) + tm_raster(palette='BrBG', title="Original - Reproduced",
+                           breaks= c(-Inf, -1, -0.1, 0, 0, 0.1, 1, Inf))
+```
+
+For the most part, the reproduced cost surface is very similar to the original.
+Most of the error is less than 0.1 cost units, or quite close to zero.
+The main areas with error of a greater magnitude occur around small, isolated buildings.
+These buildings were likely too small to rasterize properly at the resolution of analysis.
+
+# Discussion
+
+In this study, we reproduced the multi-criteria movement cost surface from Lyimo et al's Makayuni Wildlife Corridor analysis.
+We did this by replicating the author-provided QGIS model workflow as closely as possible in an R script, employing the 'stars' and 'raster' packages.
+However, some unplanned deviations from the QGIS model were necessary.
+
+First of all, we decided not to clip the nationwide landcover raster to the "initial_clip" extent before clipping to "bounding_box", as this seemed to be an unnecessary extra step in the workflow.
+This modification did mean that we needed to clip the landcover raster before reprojecting, as the original nationwide raster was too large to efficiently reproject.
+However, these steps should not have resulted in any changes in the final result.
+
+Second, when reclassifying landcover into movement cost values, we modified the reclassification table into intervals to account for decimal values in the landcover raster.
+We are unsure as to why the landcover raster contains decimal values, but it was critical to incorporate them into the analysis.
+The original reclassification table in the QGIS model only reclassified integers.
+This modification resulted in some widespread "noise" in the landcover cost raster that is visible as minor error in the difference map.
+
+Third, we rasterized major roads before buffering, due to easy of functionality within the stars and raster packages.
+The original QGIS model buffered roads before rasterizing.
+This modification created a small amount of error, the width of one pixel or so, on the edges of the major road buffers.
+
+Overall, our reproduced cost surface is quite similar to the original, as illustrated in Figure 9.
+The main areas with error of a significant magnitude occur as proximity "bubbles" around small, isolated buildings, which are likely too small to rasterize properly at the 10m resolution of analysis.
+Interestingly, all of these buildings rasterized properly for the original authors in the QGIS model, which also used a 10m resolution.
+This discrepancy can only be explained by a difference in computational environment between QGIS and the 'stars' and 'raster' packages in R.
+This error is an example of a partition distortion, one type of geographic threat to validity in this field of research.
+In this instance of the Modifiable Areal Unit Problem (MAUP), a coarse spatial resolution obscures finer-scale phenomena.
+
+We found the original study to be reasonably understandable and reproducible.
+Some additional documentation and metadata would have been useful (for example, it was difficult to discern that the resolution of analysis was 10m without reading the manuscript), but overall, the QGIS model made the inputs, outputs, operations, parameters, and sequence quite clear.
+The primary challenge in this reproduction study was performing the necessary operations in the R computational environment.
+After struggling to perform all operations within a single package, we found it necessary to convert between the 'stars' and 'raster' packages, which introduced additional challenges.
+A more streamlined and reproducible study would maintain all data within a single package format.
+
+# Conclusion
+
+We reproduced the movement cost surface from Lyimo et al's Makayuni Wildlife Corridor analysis with some degree of success, converting the original QGIS model into an R script.
+The primary source of error was an unresolvable difference in computational environment that resulted in some buildings failing to rasterize properly at the resolution of analysis, creating isolated "bubbles" of error in proximity to these buildings.
+This discrepancy demonstrates the impacts of partition distortion, in particular the Modifiable Areal Unit Problem, on reproduction analyses in different computational environments.
+Otherwise, we found the original study to be relatively simple to follow, illustrating the reproducibility of a QGIS model given the proper documentation and metadata.
+
+# Integrity Statement
+
+The authors completed the preregistration for this report before attempting the reproduction study.
+
+# Acknowledgements
+
+This report is based upon the template for Reproducible and Replicable Research in Human-Environment and Geographical Sciences, [DOI:[10.17605/OSF.IO/W29MQ](DOI:%5B10.17605/OSF.IO/W29MQ){.uri}](https://doi.org/10.17605/OSF.IO/W29MQ)
