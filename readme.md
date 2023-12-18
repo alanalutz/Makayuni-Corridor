@@ -70,7 +70,7 @@ The data, procedures, and results of this repository are outlined in three table
 
 Important local **documents** include:
 - Pre-analysis plan: [docs/report/analysis_plan.md](docs/report/analysis_plan.md)
-- Study report: [docs/index.html](docs/index.html)
+- Study report: [docs/index.html](https://alanalutz.github.io/Makayuni-Corridor/)
 
 #### Compendium reference
 
