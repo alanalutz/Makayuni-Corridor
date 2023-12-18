@@ -5,7 +5,7 @@ This template is modified from:
 
 ## Contributors
 
-- Emmanuel H. Lyimo<sup>1</sup>\*, email address, [ORCID link](https://orcid.org/0000-0002-5750-8636), College of African Wildlife Management, Mweka. P.O Box 3031, Moshi, Tanzania 
+- Emmanuel H. Lyimo<sup>1</sup>\*, lyimo.emanuel@gmail.com, [ORCID link](https://orcid.org/0000-0002-5750-8636) 
 - Gabriel M. Mayengo<sup>1</sup>, mayengogabriel@gmail.com
 - David J. Castico<sup>2</sup>, davidcastico@gmail.com
 - Damian Nguma<sup>3</sup>, damiannguma@gmail.com
