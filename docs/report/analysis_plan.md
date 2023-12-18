@@ -102,7 +102,7 @@ It must be downloaded from the original authors.
 -   `Spatial Resolution`: 4.78m
 -   `Spatial Reference System`: EPSG 3857
 -   `Temporal Coverage`: 2023
--   `Lineage`: (Song et al 2023)[<https://doi.org/10.1016/j.jag.2022.103152>]
+-   `Lineage`: [Song et al 2023](<https://doi.org/10.1016/j.jag.2022.103152>)
 -   `Distribution`: Shared by original authors
 -   `Bands`: 1
     -   `Label`: Landcover
