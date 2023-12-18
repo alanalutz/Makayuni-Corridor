@@ -70,20 +70,20 @@ We will reproduce the author's original methodology as closely as possible using
 
 ### Computational environment
 
-R version 4.3.2 (2023-10-31)
-Platform: x86_64-apple-darwin20 (64-bit)
-Running under: macOS Sonoma 14.1.2
-Hardware: MacBook Pro 2019, 1.4 GHz Quad-Core Intel Core i5
+R version 4.3.2 (2023-10-31)\
+Platform: x86_64-apple-darwin20 (64-bit)\
+Running under: macOS Sonoma 14.1.2\
+Hardware: MacBook Pro 2019, 1.4 GHz Quad-Core Intel Core i5\
 
 Packages:
 
-tidyverse_2.0.0
-here_1.0.1
-sf_1.0-14
-stars_0.6-4
-raster_3.6-26
-groundhog_3.1.2
-conflicted_1.2.0
+tidyverse_2.0.0\
+here_1.0.1\
+sf_1.0-14\
+stars_0.6-4\
+raster_3.6-26\
+groundhog_3.1.2\
+conflicted_1.2.0\
 
 ### Data and variables
 
