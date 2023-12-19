@@ -131,13 +131,16 @@ Each of the next subsections describes one data source.
 
 #### Land Cover
 
+**Note:** This file size of this raster is too large to be uploaded to GitHub.
+It must be downloaded from the original authors.
+
 -   `Abstract`: A raster of classified landcover for the entire country of Tanzania.
 -   `Label`: landcover.tif
 -   `Spatial Coverage`: Tanzania
 -   `Spatial Resolution`: 4.78m
 -   `Spatial Reference System`: EPSG 3857
 -   `Temporal Coverage`: 2023
--   `Lineage`: (Song et al 2023)[<https://doi.org/10.1016/j.jag.2022.103152>]
+-   `Lineage`: [Song et al 2023](<https://doi.org/10.1016/j.jag.2022.103152>)
 -   `Distribution`: Shared by original authors
 -   `Bands`: 1
     -   `Label`: Landcover
@@ -667,7 +670,7 @@ tm_shape(buffer_raster) + tm_raster(title="Buffer Zone Cost",
                                 labels=c('0', '999'))
 ```
 
-6.  Calculate cost surface.
+6. Calculate cost surface.
 
 Inputs: major_roads_buff, secondary_roads_raster, prox_reclass, lc_reclass, buffer_raster
 
@@ -702,7 +705,8 @@ cost <- (A+(0.25*B)+C+D+E)/4
 writeRaster(cost, filename=here("results", "figures", "reproduced_cost_surface"), overwrite=T)
 ```
 
-7.  Compare to cost surface produced by the original study.
+7\.
+Compare to cost surface produced by the original study.
 
 Inputs: cost, DD_cost_6.tif
 
