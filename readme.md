@@ -29,11 +29,12 @@ This template is modified from:
 
 ## Abstract
 
-This study is a reproduction of unpublished research by Emmanual H Lyimo et al (2023), titled: Makuyuni Wildlife Corridor: Analysis of the Effects of Socioecological Interactions and Changing Land Use on Movement Patterns of Large Mammal Species.
+This study is a reproduction of unpublished research by Lyimo et al (2023), titled: Makuyuni Wildlife Corridor: Analysis of the Effects of Socioecological Interactions and Changing Land Use on Movement Patterns of Large Mammal Species.
 The original study evaluated the connectivity of Makuyuni Wildlife Corridor, a stretch of unprotected land between Tarangire National Park and Essmingor National Forest Reserve in Tanzania.
-We reproduce the first part of the study, a multifactor analysis model that approximates cost of movement through the corridor based on least cost pathway analysis.
+We reproduce the first part of the study, a multifactor analysis model that approximates a movement cost surface for the corridor.
 The study was originally conducted using the QGIS Model Builder, and we reproduce the workflow in R.
-The goal of the study is to reproduce the authors' map displaying the minimum cost of movement through each point in the study area, compare the reproduced map to the original map, and evaluate why the reproduction may differ from the original.
+The goal of the study is to reproduce the authors' map displaying the minimum cost of movement through each point in the study area, compare the reproduced map to the original map, and evaluate why the reproduction differs from the original.
+Our reproduction is relatively successful, with some minor discrepancies attributed to differences in computational environment.
 
 ## Study Metadata
 
